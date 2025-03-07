@@ -17,7 +17,7 @@ export default function Home() {
 	const [isMuted, setIsMuted] = useState(true);
 	const [activeVideo, setActiveVideo] = useState(videos[0]);
 	const [playbackTime, setPlaybackTime] = useState("00:00:00");
-	const [isPaused, setIsPaused] = useState(false);
+	const [isPaused, setIsPaused] = useState(true);
 	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 	const videoRef = useRef(null);
 	const mainTitleRef = useRef(null);
@@ -277,8 +277,10 @@ export default function Home() {
 		}
 	};
 	useEffect(() => {
-		gsap.set(mainTitleRef.current, { zIndex: 0 });
-	}, []);
+		setTimeout(() => {
+			gsap.set(mainTitleRef.current, { zIndex: 0 });
+		}, 0);
+	}, [activeVideo]);
 	const handleVideoClick = () => {
 		if (videoRef.current) {
 			if (videoRef.current.paused) {
@@ -326,10 +328,11 @@ export default function Home() {
 	};
 
 	return (
-		<div className="max-h-[100vh] overflow-hidden">
+		<div className="">
 			<main
-				className="relative h-screen w-full overflow-hidden main"
+				className="relative h-screen w-full overflow-hidden main cursor-pointer"
 				onMouseMove={handleMouseMove}
+				onClick={handleVideoClick}
 				ref={bannerRef}
 			>
 				{/* Background Video */}
@@ -347,7 +350,7 @@ export default function Home() {
 					loop={false}
 					muted
 					playsInline
-					onClick={handleVideoClick}
+					// onClick={handleVideoClick}
 					onEnded={handleVideoEnd}
 				/>
 				<div className="video-overlay absolute inset-0" />
@@ -399,7 +402,7 @@ export default function Home() {
 				{/* Main Title */}
 				<div
 					ref={mainTitleRef}
-					className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-40  "
+					className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-40 mt-[3rem]  "
 					style={{ opacity: isPaused ? 1 : 0 }}
 				>
 					<h2 className="text-[3rem] md:text-[5rem] font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-500">

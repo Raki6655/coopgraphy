@@ -129,8 +129,8 @@ export default function VideoPage() {
 							: videoRef.current?.pause();
 						setIsPaused(!isPaused);
 					}}
-					onFullscreenChange={(e) => document.exitFullscreen()}
-					onWebkitBeginFullscreen={(e) => e.preventDefault()}
+					// onFullscreenChange={(e) => document.exitFullscreen()}
+					// onWebkitBeginFullscreen={(e) => e.preventDefault()}
 				/>
 
 				{/* Header */}
