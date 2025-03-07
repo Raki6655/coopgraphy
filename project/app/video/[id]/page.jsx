@@ -5,104 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Volume2, VolumeX, ArrowUpLeft, Pause, Play } from "lucide-react";
+import { videos } from "@/constants/videoData";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// Mock video data (replace with your actual data fetching logic)
-const videos = [
-	{
-		id: 3,
-		title: "JASMINE SULLIVAN | LOST IN TIME",
-		url: "/videos/video3.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1516726817505-f5ed825624b0?auto=format&fit=crop&w=300&q=80",
-		year: 2024,
-		description:
-			"A mesmerizing visual experience that blends nostalgia with modern storytelling.",
-		production: {
-			company: "Blue Moon Studios",
-			director: "Elijah Carter",
-			photography: "Madison Rivera",
-			camera: ["Sony FX9", "RED V-Raptor"],
-			ge: ["ARRI Orbiter", "Aputure Nova P600C"],
-		},
-	},
-	{
-		id: 1,
-		title: "FRANK OCEAN | WAVES",
-		url: "/videos/video1.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1506166779243-65fce2b47cb2?auto=format&fit=crop&w=300&q=80",
-		year: 2023,
-		description:
-			"A dreamy and immersive short film capturing the essence of solitude and longing.",
-		production: {
-			company: "Silver Light Films",
-			director: "Isabella Chang",
-			photography: "Noah Bennett",
-			camera: ["ARRI Amira", "Sony FX3"],
-			ge: ["Litepanels Astra", "Dedolight DLED4"],
-		},
-	},
-	{
-		id: 2,
-		title: "H.E.R. | INNER LIGHT",
-		url: "/videos/video2.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&w=300&q=80",
-		year: 2022,
-		description:
-			"A poetic and visually striking piece that explores identity and transformation.",
-		production: {
-			company: "Luminous Motion",
-			director: "Cameron Hayes",
-			photography: "Lily Anderson",
-			camera: ["Canon C700", "Panasonic EVA1"],
-			ge: ["Godox VL300", "Astera AX1 Pixel Tubes"],
-		},
-	},
-	{
-		id: 4,
-		title: "TYLER, THE CREATOR | IN BLOOM",
-		url: "/videos/video4.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1470434767159-ac7bf1b43351?auto=format&fit=crop&w=300&q=80",
-		year: 2021,
-		description:
-			"A bold, colorful, and surreal journey through sound and artistic expression.",
-		production: {
-			company: "Neon Visions",
-			director: "Julian Ford",
-			photography: "Sierra Collins",
-			camera: ["Blackmagic Pocket 6K Pro", "Fujifilm GFX100"],
-			ge: ["Nanlux Evoke 1200", "Kino Flo Diva-Lite"],
-		},
-	},
-	{
-		id: 5,
-		title: "SZA | FADED MEMORIES",
-		url: "/videos/video5.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1499084732479-de2c02d45fc4?auto=format&fit=crop&w=300&q=80",
-		year: 2020,
-		description:
-			"A stunningly raw and emotional portrayal of love, loss, and self-discovery.",
-		production: {
-			company: "Eclipse Motion Pictures",
-			director: "Valerie Brooks",
-			photography: "Daniel Carter",
-			camera: ["Sony A1", "RED Gemini 5K"],
-			ge: ["Profoto B10X", "Westcott Ice Light 2"],
-		},
-	},
-];
-
-// Generate static paths for all videos
-// export function generateStaticParams() {
-//   return videos.map((video) => ({
-//     id: video.id.toString(), // Convert ID to string (required for dynamic routes)
-//   }));
-// }
 
 export default function VideoPage() {
 	const router = useRouter();
@@ -129,15 +34,6 @@ export default function VideoPage() {
 	// GSAP ScrollTrigger setup
 	useEffect(() => {
 		const ctx = gsap.context(() => {
-			// Pin the video section
-			// ScrollTrigger.create({
-			// 	trigger: ".video-section",
-			// 	start: "top bottom",
-			// 	end: "+=0%",
-			// 	pin: true,
-			// 	pinSpacing: false,
-			// });
-
 			// Animate the details section to scroll over the video
 			gsap.fromTo(
 				detailsRef.current,
@@ -225,6 +121,7 @@ export default function VideoPage() {
 					className="absolute inset-0 w-full h-full object-cover cursor-pointer"
 					autoPlay
 					loop
+					playsInline
 					muted={isMuted}
 					onClick={() => {
 						videoRef.current?.paused
@@ -232,6 +129,8 @@ export default function VideoPage() {
 							: videoRef.current?.pause();
 						setIsPaused(!isPaused);
 					}}
+					onFullscreenChange={(e) => document.exitFullscreen()}
+					onWebkitBeginFullscreen={(e) => e.preventDefault()}
 				/>
 
 				{/* Header */}
@@ -280,45 +179,57 @@ export default function VideoPage() {
 				className="details-section relative bg-black text-white z-20 pt-20 px-8 min-h-screen"
 			>
 				<div className="">
-					<div className="flex gap-3 items-start mb-10">
-						<h1 className="text-7xl font-bold mb-4">{videoDetails.title}</h1>
+					<div className="flex  items-start mb-10 gap-8">
+						<h1 className="text-3xl lg:text-7xl font-bold mb-4">
+							{videoDetails.title}
+						</h1>
 						<p className="text-lg mb-12">({videoDetails.year})</p>
 					</div>
 
-					<div className="space-y-8 mb-16 ">
-						<p className="text-2xl font-medium mb-4">
+					<div className="space-y-16 mb-16 ">
+						<p className="text-md lg:text-2xl font-medium mb-4">
 							{videoDetails.description}
 						</p>
 
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<h3 className="font-bold mb-4">PRODUCTION COMPANY</h3>
-								<p>{videoDetails?.production?.company}</p>
+								<p className="text-gray-400">
+									{videoDetails?.production?.company}
+								</p>
 							</div>
 
 							<div>
 								<h3 className="font-bold mb-4">DIRECTOR</h3>
-								<p>{videoDetails.production?.director}</p>
+								<p className="text-gray-400">
+									{videoDetails.production?.director}
+								</p>
 							</div>
 						</div>
 
 						<div className="border-t border-white pt-8">
 							<h3 className="font-bold mb-4">DIRECTOR OF PHOTOGRAPHY</h3>
-							<p>{videoDetails.production?.photography}</p>
+							<p className="text-gray-400">
+								{videoDetails.production?.photography}
+							</p>
 						</div>
 
 						<div className="grid grid-cols-2 gap-8">
 							<div>
 								<h3 className="font-bold mb-4">CAMERA</h3>
 								{videoDetails.production?.camera.map((name, i) => (
-									<p key={i}>{name}</p>
+									<p key={i} className="text-gray-400">
+										{name}
+									</p>
 								))}
 							</div>
 
 							<div>
 								<h3 className="font-bold mb-4">G+E</h3>
 								{videoDetails.production?.ge.map((name, i) => (
-									<p key={i}>{name}</p>
+									<p key={i} className="text-gray-400">
+										{name}
+									</p>
 								))}
 							</div>
 						</div>

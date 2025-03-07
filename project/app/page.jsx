@@ -8,96 +8,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AboutModal from "../components/AboutModal";
+import { videos } from "@/constants/videoData";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const videos = [
-	{
-		id: 3,
-		title: "JASMINE SULLIVAN | LOST IN TIME",
-		url: "/videos/video3.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1516726817505-f5ed825624b0?auto=format&fit=crop&w=300&q=80",
-		year: 2024,
-		description:
-			"A mesmerizing visual experience that blends nostalgia with modern storytelling.",
-		production: {
-			company: "Blue Moon Studios",
-			director: "Elijah Carter",
-			photography: "Madison Rivera",
-			camera: ["Sony FX9", "RED V-Raptor"],
-			ge: ["ARRI Orbiter", "Aputure Nova P600C"],
-		},
-	},
-	{
-		id: 1,
-		title: "FRANK OCEAN | WAVES",
-		url: "/videos/video1.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1506166779243-65fce2b47cb2?auto=format&fit=crop&w=300&q=80",
-		year: 2023,
-		description:
-			"A dreamy and immersive short film capturing the essence of solitude and longing.",
-		production: {
-			company: "Silver Light Films",
-			director: "Isabella Chang",
-			photography: "Noah Bennett",
-			camera: ["ARRI Amira", "Sony FX3"],
-			ge: ["Litepanels Astra", "Dedolight DLED4"],
-		},
-	},
-	{
-		id: 2,
-		title: "H.E.R. | INNER LIGHT",
-		url: "/videos/video2.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?auto=format&fit=crop&w=300&q=80",
-		year: 2022,
-		description:
-			"A poetic and visually striking piece that explores identity and transformation.",
-		production: {
-			company: "Luminous Motion",
-			director: "Cameron Hayes",
-			photography: "Lily Anderson",
-			camera: ["Canon C700", "Panasonic EVA1"],
-			ge: ["Godox VL300", "Astera AX1 Pixel Tubes"],
-		},
-	},
-	{
-		id: 4,
-		title: "TYLER, THE CREATOR | IN BLOOM",
-		url: "/videos/video4.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1470434767159-ac7bf1b43351?auto=format&fit=crop&w=300&q=80",
-		year: 2021,
-		description:
-			"A bold, colorful, and surreal journey through sound and artistic expression.",
-		production: {
-			company: "Neon Visions",
-			director: "Julian Ford",
-			photography: "Sierra Collins",
-			camera: ["Blackmagic Pocket 6K Pro", "Fujifilm GFX100"],
-			ge: ["Nanlux Evoke 1200", "Kino Flo Diva-Lite"],
-		},
-	},
-	{
-		id: 5,
-		title: "SZA | FADED MEMORIES",
-		url: "/videos/video5.mp4",
-		thumbnail:
-			"https://images.unsplash.com/photo-1499084732479-de2c02d45fc4?auto=format&fit=crop&w=300&q=80",
-		year: 2020,
-		description:
-			"A stunningly raw and emotional portrayal of love, loss, and self-discovery.",
-		production: {
-			company: "Eclipse Motion Pictures",
-			director: "Valerie Brooks",
-			photography: "Daniel Carter",
-			camera: ["Sony A1", "RED Gemini 5K"],
-			ge: ["Profoto B10X", "Westcott Ice Light 2"],
-		},
-	},
-];
 
 export default function Home() {
 	const [currentTime, setCurrentTime] = useState(new Date());
@@ -132,15 +45,16 @@ export default function Home() {
 	}, [isMuted]);
 
 	useEffect(() => {
-		console.log(videoRef.current);
 		const video = videoRef.current;
-		console.log("triggered");
+
 		ScrollTrigger.create({
 			trigger: scrollSectionRef.current,
 			start: "top top",
 			end: "+=200%",
 			pin: bannerRef.current,
 			// markers: true,
+			// pinSpacer: false,
+			// pinSpacing: false,
 			scrub: true,
 			onUpdate: (self) => {
 				if (!video.duration || isNaN(video.duration)) return;
@@ -285,6 +199,68 @@ export default function Home() {
 		});
 	};
 
+	useEffect(() => {
+		if (carouselRef.current) {
+			const activeCard = carouselRef.current.querySelector(
+				`[data-video-id="${activeVideo.id}"]`
+			);
+			if (activeCard) {
+				const carousel = carouselRef.current;
+				const cardRect = activeCard.getBoundingClientRect();
+				const carouselRect = carousel.getBoundingClientRect();
+				const scrollLeft =
+					cardRect.left -
+					carouselRect.left +
+					carousel.scrollLeft -
+					(carouselRect.width / 2 - cardRect.width / 2);
+
+				gsap.to(carousel, {
+					scrollLeft: scrollLeft,
+					duration: 0.5,
+					ease: "power3.out",
+				});
+			}
+		}
+	}, [activeVideo]);
+
+	// Sync page scroll with carousel scroll
+	useEffect(() => {
+		if (carouselRef.current) {
+			const carousel = carouselRef.current;
+			const totalWidth = carousel.scrollWidth - carousel.clientWidth;
+
+			ScrollTrigger.create({
+				trigger: carousel,
+				start: "top top",
+				end: "+=200%",
+				scrub: true,
+				onUpdate: (self) => {
+					const scrollProgress = self.progress;
+					carousel.scrollLeft = scrollProgress * totalWidth;
+
+					// Update active video based on scroll progress
+					const totalDuration = videos.reduce(
+						(sum, video) => sum + video.duration,
+						0
+					);
+					const currentTime = scrollProgress * totalDuration;
+
+					let accumulatedDuration = 0;
+					for (const video of videos) {
+						if (currentTime < accumulatedDuration + video.duration) {
+							setActiveVideo(video);
+							setPlaybackProgress(
+								(currentTime - accumulatedDuration) / video.duration
+							);
+							break;
+						}
+						accumulatedDuration += video.duration;
+					}
+				},
+			});
+		}
+	}, []);
+
 	// Helper function to format duration (mm:ss)
 
 	const handleMouseMove = (e) => {
@@ -300,7 +276,9 @@ export default function Home() {
 			});
 		}
 	};
-
+	useEffect(() => {
+		gsap.set(mainTitleRef.current, { zIndex: 0 });
+	}, []);
 	const handleVideoClick = () => {
 		if (videoRef.current) {
 			if (videoRef.current.paused) {
@@ -348,7 +326,7 @@ export default function Home() {
 	};
 
 	return (
-		<div>
+		<div className="max-h-[100vh] overflow-hidden">
 			<main
 				className="relative h-screen w-full overflow-hidden main"
 				onMouseMove={handleMouseMove}
@@ -387,7 +365,7 @@ export default function Home() {
 
 				{/* Header */}
 				<header className="absolute top-0 left-0 right-0 p-6 flex bg-black/900 items-center justify-between z-20">
-					<div className="flex items-center space-x-4 text-gray-100">
+					<div className="flex items-center space-x-4 text-gray-100 w-[4rem]">
 						{/* <span className="text-sm font-mono font-bold text-gray-100">
 						{format(currentTime, "HH:mm:ss")} PST
 					</span> */}
@@ -395,7 +373,9 @@ export default function Home() {
 							onClick={() => setIsMuted(!isMuted)}
 							className="sound-toggle flex items-center space-x-2"
 						>
-							<span className="text-lg font-bold tracking-widest">SOUND:</span>
+							<span className="text-sm lg:text-lg font-bold tracking-widest">
+								SOUND:
+							</span>
 							{isMuted ? (
 								<VolumeX size={20} className="font-bold" fontWeight={900} />
 							) : (
@@ -404,7 +384,7 @@ export default function Home() {
 						</button>
 					</div>
 
-					<h1 className=" font-extrabold tracking-[2rem] text-3xl mr-22">
+					<h1 className=" font-extrabold tracking-[0.5rem] lg:tracking-[1.5rem] text-2xl lg:text-5xl  ">
 						COOPER
 					</h1>
 
@@ -419,14 +399,13 @@ export default function Home() {
 				{/* Main Title */}
 				<div
 					ref={mainTitleRef}
-					className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-40"
+					className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-40  "
 					style={{ opacity: isPaused ? 1 : 0 }}
 				>
-					<h2 className="text-6xl md:text-8xl font-bold tracking-wider">
-						<span className="text-white">
-							{activeVideo.title.split("|")[0]}
-						</span>
+					<h2 className="text-[3rem] md:text-[5rem] font-extrabold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-500">
+						<span>{activeVideo.title.split("|")[0]}</span>
 						<span className="text-blue-500">
+							{" "}
 							| {activeVideo.title.split("|")[1]}
 						</span>
 					</h2>
@@ -444,10 +423,10 @@ export default function Home() {
 					{/* Video Carousel */}
 					<div
 						ref={carouselRef}
-						className="video-carousel flex space-x-1  pb-4 w-full justify-center"
+						className="video-carousel flex space-x-1   w-full justify-center mt-2"
 					>
 						{videos.map((video) => (
-							<div className="relative max-w-[15vw] z-3" key={video.id}>
+							<div className="relative max-w-[21vw] z-3" key={video.id}>
 								{activeVideo.id === video.id && (
 									<div className=" mb-4 absolute -top-4 z-3 w-full  ">
 										<div className="absolute bottom-full left-2 right-0 flex justify-between items-center">
@@ -491,16 +470,21 @@ export default function Home() {
 						<div ref={blurRef} className="progress-blur" />
 						<div ref={progressRef} className="timeline-progress" />
 					</div>
-					<div className="flex justify-between items-end mb-8 mt-4">
+					<div className="flex justify-between items-center mb-8 px-2 lg:px-8 mt-8">
 						<div className="flex items-center space-x-4">
 							<a href="#" className="hover:text-blue-500 transition-colors">
 								<Instagram size={20} />
 							</a>
-							<a href="#" className="hover:text-blue-500 transition-colors">
+							<a
+								href="#"
+								className="hover:text-blue-500 transition-colors font-bold text-xs lg:text-md"
+							>
 								CINEMATOGRAPHY
 							</a>
 						</div>
-						<span className="text-sm">LOS ANGELES BASED DIRECTOR</span>
+						<span className="text-xs lg:text-sm font-bold">
+							LOS ANGELES BASED DIRECTOR
+						</span>
 					</div>
 				</footer>
 			</main>

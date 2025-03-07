@@ -12,7 +12,11 @@ body {
 	color: rgb(var(--foreground-rgb));
 	background: rgb(var(--background-start-rgb));
 }
-
+video {
+	user-select: none; /* Prevent user selection */
+	-webkit-touch-callout: none; /* Disable long-press options */
+	pointer-events: none; /* Prevent clicking */
+}
 .video-overlay {
 	background: linear-gradient(
 		to bottom,
@@ -58,10 +62,14 @@ body {
 }
 
 .timeline {
-	height: 2px;
+	height: 4px;
 	background: rgba(255, 255, 255, 0.2);
 	position: relative;
 	overflow: hidden;
+	border-radius: 20px;
+	width: 96%;
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 .timeline-progress {

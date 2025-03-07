@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import { X } from "lucide-react";
 
 export default function AboutModal({ isOpen, onClose }) {
 	const modalRef = useRef(null);
@@ -41,15 +42,15 @@ export default function AboutModal({ isOpen, onClose }) {
 	return (
 		<div
 			ref={modalRef}
-			className="fixed inset-0 bg-black overflow-hidden opacity-60 z-0"
+			className="relative lg:fixed inset-0 bg-black  opacity-60 z-0 flex flex-col lg:flex-row"
 		>
 			{/* Left Fixed Panel */}
 			<div
 				ref={leftPanelRef}
-				className="fixed left-0 top-0 w-1/3 h-full bg-gray-800 p-12"
+				className="relative lg:fixed left-0 top-0 w-full lg:w-1/3 h-full bg-gray-800 p-2 lg:p-12"
 			>
-				<h1 className="text-6xl font-bold mb-8">About</h1>
-				<h2 className="text-4xl font-bold mb-12">COOPER</h2>
+				<h1 className="text-2xl lg:text-6xl font-bold mb-4 lg:mb-8">About</h1>
+				<h2 className="text-2xl lg:text-4xl font-bold mb-6 lg:mb-12">COOPER</h2>
 				<p className="text-lg leading-relaxed">
 					Cooper is a visionary filmmaker and creative director from Brooklyn,
 					New York. His work blends raw storytelling with striking
@@ -61,29 +62,29 @@ export default function AboutModal({ isOpen, onClose }) {
 			{/* Right Scrollable Content */}
 			<div
 				ref={rightPanelRef}
-				className="ml-[33.33%] w-2/3 h-full overflow-y-auto p-12"
+				className="ml-0 lg:ml-[33.33%] w-full lg:w-2/3 h-full overflow-y-scroll p-12"
 			>
 				<div className="max-w-2xl mx-auto">
-					<p className="text-lg mb-12 leading-relaxed">
+					<p className=" text-xl lg:text-4xl mb-12 leading-relaxed mt-20">
 						With a focus on authenticity and emotion, Cooper's artistry is
 						dedicated to showcasing diverse perspectives and capturing human
 						connection in its purest form.
 					</p>
 
-					<div className="space-y-12">
-						<div>
-							<h3 className="text-xl font-bold mb-4">Worked With:</h3>
-							<ul className="space-y-2 text-lg">
-								<li>Netflix</li>
-								<li>Apple Music</li>
-								<li>Gucci</li>
-								<li>Universal Pictures</li>
-								<li>ESPN</li>
-								<li>Disney</li>
-								<li>MTV</li>
-								<li>Vogue</li>
-								<li>Mercedes-Benz</li>
-								<li>Rolling Stone</li>
+					<div className="space-y-20">
+						<div className=" gap-4 items-center">
+							<h3 className="text-xl font-bold mb-4 mt-20">Worked With:</h3>
+							<ul className="space-y-2 text-lg flex gap-1 items-center w-full flex-wrap ">
+								<li className=" w-[10rem]">Netflix</li>
+								<li className=" w-[10rem]">Apple Music</li>
+								<li className=" w-[10rem]">Gucci</li>
+								<li className=" w-[10rem]">Universal Pictures</li>
+								<li className=" w-[10rem]">ESPN</li>
+								<li className=" w-[10rem]">Disney</li>
+								<li className=" w-[10rem]">MTV</li>
+								<li className=" w-[10rem]">Vogue</li>
+								<li className=" w-[10rem]">Mercedes-Benz</li>
+								<li className=" w-[10rem]">Rolling Stone</li>
 							</ul>
 						</div>
 
@@ -123,9 +124,9 @@ export default function AboutModal({ isOpen, onClose }) {
 			{/* Close Button */}
 			<button
 				onClick={onClose}
-				className="fixed top-8 right-8 text-2xl p-2 hover:bg-gray-100 rounded-full"
+				className="fixed top-8 right-8 h-12 w-12 flex items-center justify-center text-8xl  hover:bg-white hover:text-black rounded-full ease-out duration-1000"
 			>
-				×
+				<X size={34} />
 			</button>
 		</div>
 	);
